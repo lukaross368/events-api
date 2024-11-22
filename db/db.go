@@ -2,6 +2,8 @@ package db
 
 import (
 	"database/sql"
+	"log"
+	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -10,14 +12,22 @@ var DB *sql.DB
 
 func InitDB() {
 	var err error
-	DB, err = sql.Open("sqlite3", "api.db")
+
+	dbPath := os.Getenv("DB_PATH")
+	if dbPath == "" {
+		dbPath = "/app/api.db"
+	}
+
+	DB, err = sql.Open("sqlite3", dbPath)
 
 	if err != nil {
-		panic("Could not connect to database")
+		log.Fatalf("Could not connect to database: %v", err)
 	}
 
 	DB.SetMaxOpenConns(10)
 	DB.SetMaxIdleConns(5)
+
+	log.Println("Database connection established")
 
 	createTables()
 }
@@ -33,7 +43,9 @@ func createTables() {
 	`
 
 	if _, err := DB.Exec(createUserTable); err != nil {
-		panic("Could not create user table")
+		log.Fatalf("Could not create user table: %v", err)
+	} else {
+		log.Println("User table created or already exists")
 	}
 
 	createEventsTable := `
@@ -48,7 +60,9 @@ func createTables() {
 	)
 	`
 	if _, err := DB.Exec(createEventsTable); err != nil {
-		panic("Could not create events table")
+		log.Fatalf("Could not create events table: %v", err)
+	} else {
+		log.Println("Events table created or already exists")
 	}
 
 	createRegistrationsTable := `
@@ -61,6 +75,8 @@ func createTables() {
 	)
 	`
 	if _, err := DB.Exec(createRegistrationsTable); err != nil {
-		panic("Could not create registrations table")
+		log.Fatalf("Could not create registrations table: %v", err)
+	} else {
+		log.Println("Registrations table created or already exists")
 	}
 }
