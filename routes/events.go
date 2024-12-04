@@ -19,6 +19,23 @@ func getEvents(context *gin.Context) {
 	context.JSON(http.StatusOK, events)
 }
 
+func getTotalEvents(context *gin.Context) {
+	events, err := models.GetAllEvents()
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error. Could not fetch events"})
+		return
+	}
+
+	count := 0
+	for i := 0; i < len(events); {
+		count++
+		i++
+	}
+
+	context.JSON(http.StatusOK, gin.H{"totalEvents": count})
+}
+
 func getEvent(context *gin.Context) {
 	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
 
