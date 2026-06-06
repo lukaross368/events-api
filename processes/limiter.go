@@ -16,10 +16,9 @@ func CleanUpOldLimiters() {
 	now := time.Now()
 
 	for ip, client := range middlewares.Clients {
-		log.Println("Checking for stale IP address")
 		if now.Sub(client.LastSeen) > staleThreshold {
 			delete(middlewares.Clients, ip)
-			log.Printf("Removed stale IP address: %s\n", ip)
+			log.Printf("Removed stale rate limiter for IP: %s\n", ip)
 		}
 	}
 }

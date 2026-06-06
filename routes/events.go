@@ -20,17 +20,11 @@ func getEvents(context *gin.Context) {
 }
 
 func getTotalEvents(context *gin.Context) {
-	events, err := models.GetAllEvents()
+	count, err := models.GetTotalEvents()
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error. Could not fetch events"})
 		return
-	}
-
-	count := 0
-	for i := 0; i < len(events); {
-		count++
-		i++
 	}
 
 	context.JSON(http.StatusOK, gin.H{"totalEvents": count})
@@ -99,7 +93,7 @@ func updateEvent(context *gin.Context) {
 	err = context.ShouldBindJSON(&updatedEvent)
 
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error. Could not parse request data."})
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Bad Request. Could not parse request data."})
 		return
 	}
 
@@ -111,7 +105,7 @@ func updateEvent(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusCreated, gin.H{"message": "Event Updated"})
+	context.JSON(http.StatusOK, gin.H{"message": "Event Updated"})
 }
 
 func deleteEvent(context *gin.Context) {

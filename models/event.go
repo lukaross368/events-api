@@ -76,7 +76,6 @@ func GetEventByID(id int64) (*Event, error) {
 }
 
 func (event Event) Update() error {
-
 	query := `
 	UPDATE events
 	SET name = ?, description = ?, location = ?, dateTime = ?
@@ -89,8 +88,14 @@ func (event Event) Update() error {
 	}
 
 	defer stmt.Close()
-	_, err = stmt.Exec(event.ID)
+	_, err = stmt.Exec(event.Name, event.Description, event.Location, event.DateTime, event.ID)
 	return err
+}
+
+func GetTotalEvents() (int, error) {
+	var count int
+	err := db.DB.QueryRow("SELECT COUNT(*) FROM events").Scan(&count)
+	return count, err
 }
 
 func (event Event) Delete() error {
